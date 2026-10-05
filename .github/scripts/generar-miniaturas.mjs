@@ -6,7 +6,7 @@ const RAIZ = ".";
 const THUMBS = "thumbs";
 
 // true = volver a crear todas las miniaturas aunque ya existan
-const REGENERAR_TODAS = true;
+const REGENERAR_TODAS = false;
 
 // Tamaño de la ventana de captura
 const VIEWPORT_WIDTH = 1400;
