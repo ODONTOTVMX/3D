@@ -5,6 +5,19 @@ import path from "path";
 const RAIZ = ".";
 const THUMBS = "thumbs";
 
+// true = volver a crear todas las miniaturas aunque ya existan
+const REGENERAR_TODAS = true;
+
+// Tamaño de la ventana de captura
+const VIEWPORT_WIDTH = 1400;
+const VIEWPORT_HEIGHT = 1000;
+
+// Área de recorte para evitar paneles laterales
+const CLIP_X = 210;
+const CLIP_Y = 90;
+const CLIP_WIDTH = 900;
+const CLIP_HEIGHT = 760;
+
 if (!fs.existsSync(THUMBS)) {
     fs.mkdirSync(THUMBS, {
         recursive: true
@@ -27,8 +40,8 @@ const browser = await chromium.launch({
 
 const page = await browser.newPage({
     viewport: {
-        width: 1200,
-        height: 900
+        width: VIEWPORT_WIDTH,
+        height: VIEWPORT_HEIGHT
     },
     deviceScaleFactor: 1
 });
@@ -47,8 +60,7 @@ for (const archivo of archivos) {
             `${nombreBase}.png`
         );
 
-    // Si ya existe, no volver a crearla
-    if (fs.existsSync(miniatura)) {
+    if (fs.existsSync(miniatura) && !REGENERAR_TODAS) {
 
         console.log(
             `Ya existe: ${miniatura}`
@@ -74,13 +86,24 @@ for (const archivo of archivos) {
             }
         );
 
-        // Dar tiempo a que cargue WebGL y el modelo 3D
-        await page.waitForTimeout(7000);
+        // Esperar a que cargue bien el visor y el modelo 3D
+        await page.waitForTimeout(8000);
+
+        // Colocar el mouse fuera de zonas activas
+        await page.mouse.move(
+            VIEWPORT_WIDTH / 2,
+            VIEWPORT_HEIGHT - 40
+        );
 
         await page.screenshot({
             path: miniatura,
             type: "png",
-            fullPage: false
+            clip: {
+                x: CLIP_X,
+                y: CLIP_Y,
+                width: CLIP_WIDTH,
+                height: CLIP_HEIGHT
+            }
         });
 
         console.log(
