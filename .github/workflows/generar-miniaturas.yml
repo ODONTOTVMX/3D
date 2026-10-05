@@ -1,0 +1,57 @@
+name: Generar miniaturas 3D
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - "*.html"
+      - ".github/scripts/generar-miniaturas.mjs"
+
+permissions:
+  contents: write
+
+jobs:
+  generar-miniaturas:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar Playwright
+        run: |
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Iniciar servidor local
+        run: |
+          python3 -m http.server 8000 > /tmp/odonto-server.log 2>&1 &
+          sleep 3
+
+      - name: Generar miniaturas
+        run: node .github/scripts/generar-miniaturas.mjs
+
+      - name: Guardar miniaturas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add thumbs
+
+          if git diff --cached --quiet; then
+            echo "No hay miniaturas nuevas."
+            exit 0
+          fi
+
+          git commit -m "Generar miniaturas automáticas 3D"
+          git push
