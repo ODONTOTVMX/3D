@@ -13,9 +13,9 @@ const VIEWPORT_WIDTH = 1400;
 const VIEWPORT_HEIGHT = 1000;
 
 // Área de recorte para evitar paneles laterales
-const CLIP_X = 210;
+const CLIP_X = 270;
 const CLIP_Y = 90;
-const CLIP_WIDTH = 900;
+const CLIP_WIDTH = 840;
 const CLIP_HEIGHT = 760;
 
 if (!fs.existsSync(THUMBS)) {
